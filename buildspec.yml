@@ -1,0 +1,24 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+  pre_build:
+    commands:
+      - echo Installing Node dependencies
+      - npm install
+      - node --version
+  build:
+    commands:
+      - echo Build started on `date`
+      - npm run build
+  post_build:
+    commands:
+      - zip -r statusi-ui-temp-$(date +%Y-%m-%d).zip ./build
+      - aws s3 cp statusi-ui-temp-$(date +%Y-%m-%d).zip s3://statusi-build-aps1/statusi-ui-temp-build-aps1/
+      - aws s3 cp build/ s3://statusi-build-aps1/statusi-ui-temp-build-aps1/build --recursive
+      - ls -lrt
+artifacts:
+  files:
+    - './app.py'
+  name: app.py
